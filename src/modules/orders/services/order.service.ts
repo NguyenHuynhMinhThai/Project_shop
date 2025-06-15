@@ -34,16 +34,23 @@ export class OrderService {
       }
 
       const baseTax = 10;
-      const specialTax = product.isSpecialTax ? product.specialTax : 0;
+      const specialTax = product.isSpecialTax ? Number(product.specialTax) : 0;
       const taxRate = (baseTax + specialTax) / 100;
-      const tax = product.price * taxRate * item.quantity;
+
+      const price = Number(product.price);
+      const basePrice = price * item.quantity;
+      const tax = basePrice * taxRate;
+      const subtotal = basePrice + tax;
+
+      // Debug log
+      console.log({ price, quantity: item.quantity, basePrice, taxRate, tax, subtotal });
 
       const orderItem = this.orderItemRepository.create({
         order: savedOrder,
         product,
         quantity: item.quantity,
-        price: product.price,
-        subtotal: product.price * item.quantity + tax,
+        price: price,
+        subtotal: subtotal,
       });
 
       await this.orderItemRepository.save(orderItem);
