@@ -29,6 +29,9 @@ export class Product {
   @Column('decimal', { precision: 5, scale: 2, default: 0 })
   specialTax: number;
 
+  @Column('decimal', { precision: 5, scale: 2, default: 0 })
+  discount: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

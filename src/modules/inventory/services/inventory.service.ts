@@ -1,9 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Inventory } from '../entities/inventory.entity';
+import { Inventory, InventoryType } from '../entities/inventory.entity';
 import { CreateInventoryDto } from '../dto/create-inventory.dto';
 import { ProductService } from '../../products/services/product.service';
+import {
+  implementCreateInventory,
+  implementFindAllInventory,
+  implementGetStockValue,
+} from '../implement/inventory.implement';
+import { UpdateInventoryDto } from '../dto/update-inventory.dto';
 
 @Injectable()
 export class InventoryService {
@@ -14,38 +20,35 @@ export class InventoryService {
   ) {}
 
   async create(createInventoryDto: CreateInventoryDto): Promise<Inventory> {
-    const product = await this.productService.findOne(createInventoryDto.productId);
-    
-    const inventory = this.inventoryRepository.create({
-      product,
-      quantity: createInventoryDto.quantity,
-      purchasePrice: createInventoryDto.purchasePrice,
-      totalValue: createInventoryDto.quantity * createInventoryDto.purchasePrice,
-      type: createInventoryDto.type,
-    });
-
-    const savedInventory = await this.inventoryRepository.save(inventory);
-    
-    if (createInventoryDto.type === 'IN') {
-      await this.productService.updateStock(product.id, createInventoryDto.quantity);
-    } else if (createInventoryDto.type === 'OUT') {
-      if (product.quantity < createInventoryDto.quantity) {
-        throw new BadRequestException('Insufficient stock for this operation');
-      }
-      await this.productService.updateStock(product.id, -createInventoryDto.quantity);
-    }
-
-    return savedInventory;
+    return implementCreateInventory(
+      createInventoryDto,
+      this.inventoryRepository,
+      this.productService,
+    );
   }
 
   async findAll(): Promise<Inventory[]> {
-    return this.inventoryRepository.find({
-      relations: ['product'],
-    });
+    return implementFindAllInventory(this.inventoryRepository);
   }
 
   async getStockValue(): Promise<number> {
-    const inventories = await this.findAll();
-    return inventories.reduce((total, inventory) => total + inventory.totalValue, 0);
+    return implementGetStockValue(this.inventoryRepository);
   }
-} 
+
+  async update(id: number, updateInventoryDto: UpdateInventoryDto): Promise<Inventory> {
+    const inventory = await this.inventoryRepository.findOne({ where: { id } });
+    if (!inventory) {
+      throw new NotFoundException(`Inventory with ID ${id} not found`);
+    }
+    Object.assign(inventory, updateInventoryDto);
+    return this.inventoryRepository.save(inventory);
+  }
+
+  async remove(id: number): Promise<void> {
+    const inventory = await this.inventoryRepository.findOne({ where: { id } });
+    if (!inventory) {
+      throw new NotFoundException(`Inventory with ID ${id} not found`);
+    }
+    await this.inventoryRepository.remove(inventory);
+  }
+}

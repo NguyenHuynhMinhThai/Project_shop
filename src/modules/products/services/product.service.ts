@@ -3,6 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { CreateProductDto } from '../dto/create-product.dto';
+import { UpdateProductDto } from '../dto/update-product.dto';
+import {
+  implementCreateProduct,
+  implementFindAllProducts,
+  implementFindOneProduct,
+  implementUpdateProduct,
+  implementRemoveProduct,
+  ProductDisplay,
+} from '../implement/product.implement';
 
 @Injectable()
 export class ProductService {
@@ -12,31 +21,24 @@ export class ProductService {
   ) {}
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
-    if (createProductDto.isSpecialTax && (createProductDto.specialTax === undefined || createProductDto.specialTax === null)) {
-      createProductDto.specialTax = 8;
-    }
-    if (!createProductDto.isSpecialTax) {
-      createProductDto.specialTax = 0;
-    }
-    const product = this.productRepository.create(createProductDto);
-    return this.productRepository.save(product);
+    return implementCreateProduct(createProductDto, this.productRepository);
   }
 
-  async findAll(): Promise<Product[]> {
-    return this.productRepository.find();
+  async findAll(): Promise<ProductDisplay[]> {
+    return implementFindAllProducts(this.productRepository);
   }
 
-  async findOne(id: number): Promise<Product> {
-    const product = await this.productRepository.findOne({ where: { id } });
-    if (!product) {
-      throw new NotFoundException(`Product with ID ${id} not found`);
-    }
-    return product;
+  async findOne(id: number): Promise<ProductDisplay> {
+    return implementFindOneProduct(id, this.productRepository);
   }
 
-  async updateStock(id: number, quantity: number): Promise<Product> {
-    const product = await this.findOne(id);
-    product.quantity += quantity;
-    return this.productRepository.save(product);
+  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+    return implementUpdateProduct(id, updateProductDto, this.productRepository);
   }
-} 
+
+  async remove(id: number): Promise<void> {
+    return implementRemoveProduct(id, this.productRepository);
+  }
+}
+
+export { ProductDisplay } from '../implement/product.implement'; 

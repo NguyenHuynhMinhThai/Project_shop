@@ -1,13 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Product } from '../../products/entities/product.entity';
 
-@Entity('inventory')
+export enum InventoryType {
+  IN = 'IN',
+  OUT = 'OUT',
+}
+
+@Entity('inventories')
 export class Inventory {
   @PrimaryGeneratedColumn()
   id: number;
 
   @ManyToOne(() => Product)
-  @JoinColumn({ name: 'product_id' })
+  @JoinColumn({ name: 'productId' })
   product: Product;
 
   @Column()
@@ -19,12 +32,12 @@ export class Inventory {
   @Column('decimal', { precision: 10, scale: 2 })
   totalValue: number;
 
-  @Column()
-  type: string; // 'IN' for stock in, 'OUT' for stock out
+  @Column({ type: 'enum', enum: InventoryType })
+  type: InventoryType; // 'IN' for stock in, 'OUT' for stock out
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
-} 
+}

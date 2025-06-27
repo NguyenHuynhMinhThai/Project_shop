@@ -1,18 +1,16 @@
-import { IsNumber, IsString, IsIn, Min } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsEnum } from 'class-validator';
+import { InventoryType } from '../entities/inventory.entity';
 
 export class CreateInventoryDto {
   @IsNumber()
   productId: number;
 
   @IsNumber()
-  @Min(1)
   quantity: number;
 
   @IsNumber()
-  @Min(0)
   purchasePrice: number;
 
-  @IsString()
-  @IsIn(['IN', 'OUT'])
-  type: string;
-} 
+  @IsEnum(InventoryType)
+  type: InventoryType;
+}
