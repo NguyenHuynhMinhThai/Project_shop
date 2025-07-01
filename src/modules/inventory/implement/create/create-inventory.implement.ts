@@ -1,9 +1,8 @@
 import { BadRequestException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Inventory, InventoryType } from '../entities/inventory.entity';
-import { CreateInventoryDto } from '../dto/create-inventory.dto';
-import { ProductService } from '../../products/services/product.service';
-import { Product } from '../../products/entities/product.entity';
+import { Inventory, InventoryType } from '../../entities/inventory.entity';
+import { CreateInventoryDto } from '../../dto/create-inventory.dto';
+import { ProductService } from '../../../products/services/product.service';
 
 export async function implementCreateInventory(
   createInventoryDto: CreateInventoryDto,

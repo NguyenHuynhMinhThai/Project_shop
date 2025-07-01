@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Inventory } from '../entities/inventory.entity';
-import { UpdateInventoryDto } from '../dto/update-inventory.dto';
+import { Inventory } from '../../entities/inventory.entity';
+import { UpdateInventoryDto } from '../../dto/update-inventory.dto';
 
 export async function implementUpdateInventory(
   id: number,

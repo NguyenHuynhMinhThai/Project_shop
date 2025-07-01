@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Inventory } from '../entities/inventory.entity';
+import { Inventory } from '../../entities/inventory.entity';
 
 export async function implementRemoveInventory(
   id: number,
