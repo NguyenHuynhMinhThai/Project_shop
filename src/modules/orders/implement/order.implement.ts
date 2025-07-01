@@ -89,10 +89,15 @@ export async function implementUpdateOrder(
 export async function implementRemoveOrder(
   id: number,
   orderRepository: Repository<Order>,
+  orderItemRepository: Repository<OrderItem>,
 ): Promise<void> {
-  const order = await orderRepository.findOne({ where: { id } });
+  const order = await orderRepository.findOne({ where: { id }, relations: ['orderItems'] });
   if (!order) {
     throw new NotFoundException(`Order with ID ${id} not found`);
+  }
+  // Xoá toàn bộ orderItems trước
+  if (order.orderItems && order.orderItems.length > 0) {
+    await orderItemRepository.remove(order.orderItems);
   }
   await orderRepository.remove(order);
 } 

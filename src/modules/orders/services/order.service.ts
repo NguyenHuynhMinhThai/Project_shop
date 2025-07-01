@@ -46,6 +46,6 @@ export class OrderService {
   }
 
   async remove(id: number): Promise<void> {
-    return implementRemoveOrder(id, this.orderRepository);
+    return implementRemoveOrder(id, this.orderRepository, this.orderItemRepository);
   }
 } 

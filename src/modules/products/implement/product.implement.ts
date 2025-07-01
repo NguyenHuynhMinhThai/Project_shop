@@ -10,6 +10,13 @@ export interface ProductDisplay {
   imageUrl: string;
 }
 
+export interface ProductPaginationResult {
+  data: ProductDisplay[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
 export async function implementCreateProduct(
   createProductDto: CreateProductDto,
   productRepository: Repository<Product>,
@@ -77,4 +84,27 @@ export async function implementRemoveProduct(
     throw new NotFoundException(`Product with ID ${id} not found`);
   }
   await productRepository.remove(product);
+}
+
+export async function implementFindAllProductsPaginated(
+  productRepository: Repository<Product>,
+  page = 1,
+  limit = 5,
+): Promise<ProductPaginationResult> {
+  const [products, total] = await productRepository.findAndCount({
+    skip: (page - 1) * limit,
+    take: limit,
+  });
+  const data = products.map((p) => ({
+    name: p.name,
+    price: Number(p.price),
+    discountedPrice: Number(p.price) * (1 - Number(p.discount) / 100),
+    imageUrl: p.imageUrl,
+  }));
+  return {
+    data,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 } 

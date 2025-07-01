@@ -8,7 +8,9 @@ import {
   implementCreateInventory,
   implementFindAllInventory,
   implementGetStockValue,
-} from '../implement/inventory.implement';
+  implementUpdateInventory,
+  implementRemoveInventory,
+} from '../implement';
 import { UpdateInventoryDto } from '../dto/update-inventory.dto';
 
 @Injectable()
@@ -36,19 +38,10 @@ export class InventoryService {
   }
 
   async update(id: number, updateInventoryDto: UpdateInventoryDto): Promise<Inventory> {
-    const inventory = await this.inventoryRepository.findOne({ where: { id } });
-    if (!inventory) {
-      throw new NotFoundException(`Inventory with ID ${id} not found`);
-    }
-    Object.assign(inventory, updateInventoryDto);
-    return this.inventoryRepository.save(inventory);
+    return implementUpdateInventory(id, updateInventoryDto, this.inventoryRepository);
   }
 
   async remove(id: number): Promise<void> {
-    const inventory = await this.inventoryRepository.findOne({ where: { id } });
-    if (!inventory) {
-      throw new NotFoundException(`Inventory with ID ${id} not found`);
-    }
-    await this.inventoryRepository.remove(inventory);
+    return implementRemoveInventory(id, this.inventoryRepository);
   }
 }

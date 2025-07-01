@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, Param, HttpCode, Put, Delete } from '@nestjs/common';
-import { ProductService, ProductDisplay } from '../services/product.service';
+import { Controller, Get, Post, Body, Param, HttpCode, Put, Delete, Query } from '@nestjs/common';
+import { ProductService, ProductDisplay, ProductPaginationResult } from '../services/product.service';
 import { CreateProductDto } from '../dto/create-product.dto';
 import { Product } from '../entities/product.entity';
 import { UpdateProductDto } from '../dto/update-product.dto';
@@ -15,8 +15,11 @@ export class ProductController {
   }
 
   @Get()
-  findAll(): Promise<ProductDisplay[]> {
-    return this.productService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ): Promise<ProductPaginationResult> {
+    return this.productService.findAll(Number(page) || 1, Number(limit) || 5);
   }
 
   @Get(':id')

@@ -10,7 +10,9 @@ import {
   implementFindOneProduct,
   implementUpdateProduct,
   implementRemoveProduct,
+  implementFindAllProductsPaginated,
   ProductDisplay,
+  ProductPaginationResult,
 } from '../implement/product.implement';
 
 @Injectable()
@@ -24,8 +26,8 @@ export class ProductService {
     return implementCreateProduct(createProductDto, this.productRepository);
   }
 
-  async findAll(): Promise<ProductDisplay[]> {
-    return implementFindAllProducts(this.productRepository);
+  async findAll(page = 1, limit = 5): Promise<ProductPaginationResult> {
+    return implementFindAllProductsPaginated(this.productRepository, page, limit);
   }
 
   async findOne(id: number): Promise<ProductDisplay> {
@@ -41,4 +43,4 @@ export class ProductService {
   }
 }
 
-export { ProductDisplay } from '../implement/product.implement'; 
+export { ProductDisplay, ProductPaginationResult } from '../implement/product.implement'; 
